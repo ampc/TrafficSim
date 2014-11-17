@@ -1,6 +1,6 @@
 import java.io.*; 
 import java.net.*;
-class TCPclient {  
+class AndroidTCPclient {  
     public static void main(String argv[]) throws Exception  {
         int port = Integer.parseInt(argv[0]);
 

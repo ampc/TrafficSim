@@ -1,9 +1,12 @@
 public class TrafficSim {
     static void test_run() {
         try {
-            ArduinoThread arduino = new ArduinoThread();
+            // ArduinoThread arduino = new ArduinoThread();
+            // Thread.sleep(5000);
+            // arduino.send_change_request(0,0);
+            AndroidThread android = new AndroidThread();
             Thread.sleep(5000);
-            arduino.send_change_request(0,0);
+            android.send_update(0,0);
 
         } catch(Exception e) {
             e.printStackTrace();
