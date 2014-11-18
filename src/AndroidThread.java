@@ -4,7 +4,7 @@ import java.io.DataOutputStream;
 import java.io.DataInputStream;
 
 class AndroidThread extends Thread {
-    private final int port = 5001;
+    private final int port = 54333;
     ServerSocket sc; // socket that the Android is connecting to
     Socket socket;
 

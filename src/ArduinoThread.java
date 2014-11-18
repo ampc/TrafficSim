@@ -5,12 +5,14 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 class ArduinoThread extends Thread {
-    private final int port = 5000;
-    private static final String ON = "H"; // H as in High
-    private static final String OFF = "L"; // L as in Low
-    private static final String RED_ON = "H11"; // H is to turn on, 11 is the red semaphore
-    private static final String RED_OFF = "L11";
-    private static final String RED_STATE = "R11";
+    private final int port = 53333;
+    private static final String INPUT = "I";
+    private static final String OUTPUT = "O";
+    private static final int ON = 1; // H as in High
+    private static final int OFF = 0; // L as in Low
+    private static final String RED_ON = "H13"; // H is to turn on, 11 is the red semaphore
+    private static final String RED_OFF = "L13";
+    private static final String RED_STATE = "R13";
 
     private final int ACK = 1;
     private final String NEW_LINE = "\n";
@@ -23,8 +25,9 @@ class ArduinoThread extends Thread {
     BufferedReader in; // read from socket
 
     public ArduinoThread() throws Exception {
-        sc = new ServerSocket(port);
-        socket = null;
+        // sc = new ServerSocket(port);
+        // socket = null;
+        socket = new Socket("192.168.1.2", 53333);
         start();
     }
 
@@ -32,7 +35,7 @@ class ArduinoThread extends Thread {
     public void run() {
         try {
             System.out.println("# Arduino: started thread...");
-            socket = sc.accept(); // wait for a connection. When connected enter the while loop
+            //socket = sc.accept(); // wait for a connection. When connected enter the while loop
             System.out.println("# Arduino: got a connection...");
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -64,17 +67,19 @@ class ArduinoThread extends Thread {
             String msg;
             System.out.println("# Arduino: Sending message...");
 
-            out.writeBytes(RED_OFF + NEW_LINE);
-            out.writeBytes(RED_STATE + NEW_LINE); // ask for the semaphore state. Response is equivalent to an ACK
+            // out.writeBytes(RED_OFF + NEW_LINE);
+            // out.writeBytes(RED_STATE + NEW_LINE); // ask for the semaphore state. Response is equivalent to an ACK
 
-            if(!change_confirmed(OFF)) {
-                // exit this function and call try again?;
-            }
-            else
-                System.out.println("# Arduino: OFF was a Success");
-
+            // if(!change_confirmed(OFF)) {
+            //     // exit this function and call try again?;
+            // }
+            // else
+            //     System.out.println("# Arduino: OFF was a Success");
+            out.writeBytes(OUTPUT + "13" + NEW_LINE); // ask arduino to be in input mode
             out.writeBytes(RED_ON +  NEW_LINE);
-            out.writeBytes(RED_STATE + NEW_LINE); // ask for the semaphore state. Response is equivalent to an ACK
+
+            out.writeBytes(RED_STATE + NEW_LINE); // ask for the semaphore state.
+            //            Response is equivalent to an ACK
 
             if(!change_confirmed(ON)) {
                 // exit this function and call try again?
@@ -88,27 +93,16 @@ class ArduinoThread extends Thread {
         }
     }
 
-    public boolean sem_is_on(String msg) {
-        return msg.equals(ON);
-    }
-
-    public boolean sem_is_off(String msg) {
-        return msg.equals(OFF);
-    }
-
     // Return if the request to change semaphore was fullfiled
     // Receives as parameter the expected state of the semaphore
     // E.g, if the arduino was asked to turn off a semaphore, expected state will be OFF
-    public boolean change_confirmed(String expected_state) {
+    public boolean change_confirmed(int expected_state) {
         try {
             String msg;
             while((msg = in.readLine()) == null); // obligatory to wait for "ack"
             msg = msg.replace(NEW_LINE, ""); // remove "\n"
 
-            if(expected_state == ON)
-                return sem_is_on(msg);
-            else
-                return sem_is_off(msg);
+            return Integer.parseInt(msg) == expected_state;
 
         } catch(Exception e) {
             e.printStackTrace();
