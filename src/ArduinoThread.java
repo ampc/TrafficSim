@@ -17,7 +17,7 @@ class ArduinoThread extends Thread {
     private final int ON = 1;
     private final int OFF = 0;
 
-    private final String RED_ON = "H13"; // H is to turn on, 11 is the red light
+    private final String RED_ON = "H13"; // H is to turn on, 13 is the red light
     private final String RED_OFF = "L13";
     private final String RED_STATE = "R13";
 
@@ -35,10 +35,10 @@ class ArduinoThread extends Thread {
     BufferedReader in; // read from socket
 
     public ArduinoThread(String SEM_IP, int port) throws Exception {
-        socket = new Socket("192.168.1.2", port);
         this.port = port;
         this.SEM_IP = SEM_IP;
         this.SEM_ID = set_id(SEM_IP);
+        socket = new Socket(SEM_IP, port);
         start();
     }
 
