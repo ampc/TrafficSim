@@ -5,11 +5,11 @@ import java.io.DataInputStream;
 
 class AndroidThread extends Thread {
     private final int port = 54333;
-    ServerSocket sc; // socket that the Android is connecting to
-    Socket socket;
+    private ServerSocket sc; // socket that the Android is connecting to
+    private Socket socket;
 
-    DataOutputStream out; // write to socket
-    DataInputStream in; // read from socket
+    private DataOutputStream out; // write to socket
+    private DataInputStream in; // read from socket
 
     public AndroidThread() throws Exception {
         sc = new ServerSocket(port);
@@ -48,12 +48,13 @@ class AndroidThread extends Thread {
     }
     // one msg to turn off "off_sem"
     // one msg to turn on "on_sem "semaphore
-    public void send_update(int on_sem, int off_sem) {
+    public void send_update(String msg) {
         try {
             System.out.println("# Android: Sending message...");
 
-            out.writeBytes("# turn " + off_sem + " off...\n");
-            out.writeBytes("# turn " + on_sem + " on...\n");
+            out.writeBytes(msg + "\n");
+
+            System.out.println("# Android: done...");
         } catch(Exception e) {
             e.printStackTrace();
         }

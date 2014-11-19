@@ -1,15 +1,41 @@
-package org.sunspotworld.demo;
-
 import com.sun.spot.io.j2me.radiogram.*;
-
 import com.sun.spot.peripheral.ota.OTACommandServer;
 import java.util.Scanner;
 import javax.microedition.io.*;
 
-public class SendDataDemoHostApplication {
+public class SunSpotThread extends Thread {
 
     private static final int HOST_PORT = 67;
     private static final int HOST_PORT_DESTINATION = 68;
+
+    public SunSpotThread() {
+        OTACommandServer.start("SendDataDemo");
+        startReceiverThread();
+        run();
+    }
+
+    public void run() {
+        Scanner stdin;
+        stdin = new Scanner(System.in);
+        while (true) {
+            System.out.println("Escrever Input");
+            String me = stdin.nextLine();
+            me.trim();
+            System.out.println("Pedir troca de sinal" + me);
+            if (me.equals("1")) {
+                cor = "vermelho1";
+            } else if (me.equals("2")) {
+                cor = "verde1";
+            }
+            else if (me.equals("3")) {
+                cor = "vermelho2";
+            }
+            else if (me.equals("4")) {
+                cor = "verde2";
+            }
+            startSenderThread();
+        }        
+    }
 
     public void startReceiverThread() {
         new Thread() {
@@ -72,34 +98,5 @@ public class SendDataDemoHostApplication {
 
         }
                 .start();
-    }
-    static Scanner stdin;
-
-    public static void main(String[] args) throws Exception {
-        // register the application's name with the OTA Command server & start OTA running
-        OTACommandServer.start("SendDataDemo");
-
-        SendDataDemoHostApplication app = new SendDataDemoHostApplication();
-        app.startReceiverThread();
-        stdin = new Scanner(System.in);
-        while (true) {
-            System.out.println("Escrever Input");
-            String me = stdin.nextLine();
-            me.trim();
-            System.out.println("Pedir troca de sinal" + me);
-            if (me.equals("1")) {
-                cor = "vermelho1";
-            } else if (me.equals("2")) {
-                cor = "verde1";
-            }
-            else if (me.equals("3")) {
-                cor = "vermelho2";
-            }
-            else if (me.equals("4")) {
-                cor = "verde2";
-            }
-
-            app.startSenderThread();
-        }
     }
 }
